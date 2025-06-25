@@ -3,9 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
+type CharmImage = {
+  id: number;
+  imageUrl: string;
+  message: string;
+  charm: {
+    id: number;
+    charmId: string;
+    name: string;
+  };
+};
+
 export default function CharmPage() {
   const { charmId } = useParams();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<CharmImage[] | null>(null);
 
   useEffect(() => {
     async function fetchData() {
