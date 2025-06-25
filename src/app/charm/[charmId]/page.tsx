@@ -1,5 +1,15 @@
-// import { use } from 'react';
+import React from 'react';
 
-export default function CharmHistoryPage({ params }: { params: { charmId: string } }) {
-  return <div>Charm ID: {params.charmId}</div>;
+type Props = {
+  params: {
+    charmId: string;
+  };
+};
+
+export default function CharmPage({ params }: Props) {
+  return (
+    <div>
+      <h1>Charm ID: {params.charmId}</h1>
+    </div>
+  );
 }
