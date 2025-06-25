@@ -7,13 +7,13 @@ type PageProps = {
 };
 
 export default async function CharmPage({ params }: PageProps) {
-  // TODO: Replace this with your actual fetch call
-  // const res = await fetch(`https://api.example.com/charm/${params.charmId}`);
-  // const data = await res.json();
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${params.charmId}/images`);
+  const data = await res.json();
 
   return (
     <main>
       <h1>Charm ID: {params.charmId}</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
     </main>
   );
 }
