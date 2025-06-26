@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 
 type CharmImage = {
@@ -17,6 +17,10 @@ type CharmImage = {
 export default function CharmPage() {
   const { charmId } = useParams();
   const [data, setData] = useState<CharmImage[] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -37,9 +41,102 @@ export default function CharmPage() {
   }, [charmId]);
 
   return (
-    <main>
-      <h1>Charm ID: {charmId}</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+    <main className="relative">
+      <div className="space-y-6 pb-20">
+        {[...data || []].reverse().map((item) => (
+          <div key={item.id} className="mb-4">
+            <img src={item.imageUrl} alt={`Charm ${charmId}`} className="w-full rounded" />
+            <p className="text-sm text-gray-700 mt-1">{item.message}</p>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={() => fileInputRef.current?.click()}
+        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 text-white bg-blue-600 rounded-full shadow-lg"
+      >
+        Upload
+      </button>
+
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        ref={fileInputRef}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setSelectedImage(reader.result as string);
+              setIsModalOpen(true);
+            };
+            reader.readAsDataURL(file);
+          }
+        }}
+        className="hidden"
+      />
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/10">
+          <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
+            {selectedImage && (
+              <img src={selectedImage} alt="Selected" className="w-full mb-4 rounded" />
+            )}
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Add a message..."
+              className="w-full p-2 border rounded mb-4"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!selectedImage || !fileInputRef.current?.files?.[0]) return;
+
+                  const formData = new FormData();
+                  formData.append('file', fileInputRef.current.files[0]);
+                  formData.append('message', message);
+
+                  try {
+                    const res = await fetch(
+                      `${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/images/upload`,
+                      {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: formData,
+                      }
+                    );
+                    if (res.ok) {
+                      setIsModalOpen(false);
+                      setMessage('');
+                      setSelectedImage(null);
+                      fileInputRef.current.value = '';
+                      const updatedData = await fetch(
+                        `${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/images`
+                      ).then((res) => res.json());
+                      setData(updatedData);
+                    } else {
+                      console.error('Upload failed:', await res.text());
+                    }
+                  } catch (error) {
+                    console.error('Upload error:', error);
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
