@@ -44,9 +44,11 @@ export default function CharmPage() {
     <main className="relative">
       <div className="space-y-6 pb-20">
         {[...data || []].reverse().map((item) => (
-          <div key={item.id} className="mb-4">
-            <img src={item.imageUrl} alt={`Charm ${charmId}`} className="w-full rounded" />
-            <p className="text-sm text-gray-700 mt-1">{item.message}</p>
+          <div key={item.id} className="mb-6 px-4">
+            <div className="p-4 bg-white rounded shadow-md">
+              <img src={item.imageUrl} alt={`Charm ${charmId}`} className="w-full h-auto object-contain rounded" />
+              <p className="text-sm text-gray-700 mt-2">{item.message}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -67,9 +69,46 @@ export default function CharmPage() {
           const file = e.target.files?.[0];
           if (file) {
             const reader = new FileReader();
-            reader.onloadend = () => {
-              setSelectedImage(reader.result as string);
-              setIsModalOpen(true);
+            reader.onload = async () => {
+              const img = new Image();
+              img.src = reader.result as string;
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const maxSize = 1024;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                  if (width > maxSize) {
+                    height *= maxSize / width;
+                    width = maxSize;
+                  }
+                } else {
+                  if (height > maxSize) {
+                    width *= maxSize / height;
+                    height = maxSize;
+                  }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                  ctx.drawImage(img, 0, 0, width, height);
+                  canvas.toBlob((blob) => {
+                    if (blob) {
+                      const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
+                      setSelectedImage(URL.createObjectURL(compressedFile));
+                      fileInputRef.current!.files = new DataTransfer().files;
+                      const dt = new DataTransfer();
+                      dt.items.add(compressedFile);
+                      fileInputRef.current!.files = dt.files;
+                      setIsModalOpen(true);
+                    }
+                  }, 'image/jpeg', 0.75);
+                }
+              };
             };
             reader.readAsDataURL(file);
           }
