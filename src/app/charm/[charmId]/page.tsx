@@ -99,7 +99,7 @@ export default function CharmPage() {
           if (file) {
             const reader = new FileReader();
             reader.onload = async () => {
-              const img = new Image();
+              const img = new window.Image();
               img.src = reader.result as string;
               img.onload = () => {
                 const canvas = document.createElement('canvas');
