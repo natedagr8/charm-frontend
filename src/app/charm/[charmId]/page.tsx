@@ -42,6 +42,9 @@ export default function CharmPage() {
 
   return (
     <main className="relative">
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 pt-4 pb-2">
+        <h1 className="text-xl font-semibold">{data?.[0]?.charm?.name || 'Charm'}</h1>
+      </div>
       <div className="space-y-6 pb-20">
         {[...data || []].reverse().map((item) => (
           <div key={item.id} className="mb-6 px-4">
