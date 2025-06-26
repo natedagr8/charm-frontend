@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 
 type CharmImage = {
   id: number;
@@ -64,7 +65,7 @@ export default function CharmPage() {
             {[...data].reverse().map((item) => (
               <div key={item.id} className="mb-6 px-4">
                 <div className="p-4 bg-white rounded shadow-md">
-                  <img src={item.imageUrl} alt={`Charm ${charmId}`} className="w-full h-auto object-contain rounded" />
+                  <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
                   <p className="text-sm text-gray-700 mt-2">{item.message}</p>
                 </div>
               </div>
@@ -79,7 +80,7 @@ export default function CharmPage() {
         </>
       ) : (
         <div className="p-6 text-center space-y-6 pb-20">
-          <p className="text-lg font-medium">This charm hasn't been registered yet! Upload a picture of it and give it a name!</p>
+          <p className="text-lg font-medium">This charm hasn&rsquo;t been registered yet! Upload a picture of it and give it a name!</p>
           <button
             onClick={() => fileInputRef.current?.click()}
             className="px-6 py-3 text-white bg-green-600 rounded-full shadow-lg"
@@ -144,12 +145,10 @@ export default function CharmPage() {
         className="hidden"
       />
 
-      {isModalOpen && (
+      {isModalOpen && selectedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/10">
           <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
-            {selectedImage && (
-              <img src={selectedImage} alt="Selected" className="w-full mb-4 rounded" />
-            )}
+            <Image src={selectedImage} alt="Selected" width={800} height={600} className="w-full mb-4 rounded" />
             {!data?.[0]?.charm?.name && (
               <input
                 value={title}
