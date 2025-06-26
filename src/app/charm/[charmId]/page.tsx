@@ -63,7 +63,6 @@ export default function CharmPage() {
       <input
         type="file"
         accept="image/*"
-        capture="environment"
         ref={fileInputRef}
         onChange={(e) => {
           const file = e.target.files?.[0];
