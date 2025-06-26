@@ -20,7 +20,10 @@ export default function CharmPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [message, setMessage] = useState('');
+  const [title, setTitle] = useState('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -32,6 +35,8 @@ export default function CharmPage() {
         setData(json);
       } catch (error) {
         console.error('Failed to fetch charm data:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -40,28 +45,49 @@ export default function CharmPage() {
     }
   }, [charmId]);
 
+  if (isLoading) {
+    return (
+      <main className="flex items-center justify-center h-screen">
+        <p className="text-lg font-medium">Loading...</p>
+      </main>
+    );
+  }
+
   return (
     <main className="relative">
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 pt-4 pb-2">
-        <h1 className="text-xl font-semibold">{data?.[0]?.charm?.name || 'Charm'}</h1>
-      </div>
-      <div className="space-y-6 pb-20">
-        {[...data || []].reverse().map((item) => (
-          <div key={item.id} className="mb-6 px-4">
-            <div className="p-4 bg-white rounded shadow-md">
-              <img src={item.imageUrl} alt={`Charm ${charmId}`} className="w-full h-auto object-contain rounded" />
-              <p className="text-sm text-gray-700 mt-2">{item.message}</p>
-            </div>
+      {data?.[0]?.charm?.name ? (
+        <>
+          <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 pt-4 pb-2">
+            <h1 className="text-xl font-semibold">{data[0].charm.name}</h1>
           </div>
-        ))}
-      </div>
-
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 text-white bg-blue-600 rounded-full shadow-lg"
-      >
-        Upload
-      </button>
+          <div className="space-y-6 pb-20">
+            {[...data].reverse().map((item) => (
+              <div key={item.id} className="mb-6 px-4">
+                <div className="p-4 bg-white rounded shadow-md">
+                  <img src={item.imageUrl} alt={`Charm ${charmId}`} className="w-full h-auto object-contain rounded" />
+                  <p className="text-sm text-gray-700 mt-2">{item.message}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 text-white bg-blue-600 rounded-full shadow-lg"
+          >
+            Upload
+          </button>
+        </>
+      ) : (
+        <div className="p-6 text-center space-y-6 pb-20">
+          <p className="text-lg font-medium">This charm hasn't been registered yet! Upload a picture of it and give it a name!</p>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="px-6 py-3 text-white bg-green-600 rounded-full shadow-lg"
+          >
+            Register Now
+          </button>
+        </div>
+      )}
 
       <input
         type="file"
@@ -124,6 +150,15 @@ export default function CharmPage() {
             {selectedImage && (
               <img src={selectedImage} alt="Selected" className="w-full mb-4 rounded" />
             )}
+            {!data?.[0]?.charm?.name && (
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter a name for this charm"
+                className="w-full p-2 border rounded mb-4"
+                required
+              />
+            )}
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -138,14 +173,27 @@ export default function CharmPage() {
                 Cancel
               </button>
               <button
+                disabled={isUploading}
                 onClick={async () => {
-                  if (!selectedImage || !fileInputRef.current?.files?.[0]) return;
+                  if (!selectedImage || !fileInputRef.current?.files?.[0] || (!data?.[0]?.charm?.name && !title.trim())) return;
 
-                  const formData = new FormData();
-                  formData.append('file', fileInputRef.current.files[0]);
-                  formData.append('message', message);
+                  setIsUploading(true); // disable button
 
                   try {
+                    if (!data?.[0]?.charm?.name && title.trim()) {
+                      const nameRes = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/name`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ name: title.trim() }),
+                      });
+                      if (!nameRes.ok) throw new Error(await nameRes.text());
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', fileInputRef.current.files[0]);
+                    formData.append('message', message);
+
                     const res = await fetch(
                       `${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/images/upload`,
                       {
@@ -154,25 +202,30 @@ export default function CharmPage() {
                         body: formData,
                       }
                     );
-                    if (res.ok) {
-                      setIsModalOpen(false);
-                      setMessage('');
-                      setSelectedImage(null);
-                      fileInputRef.current.value = '';
-                      const updatedData = await fetch(
-                        `${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/images`
-                      ).then((res) => res.json());
-                      setData(updatedData);
-                    } else {
-                      console.error('Upload failed:', await res.text());
-                    }
+
+                    if (!res.ok) throw new Error(await res.text());
+
+                    const updatedData = await fetch(
+                      `${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/images`
+                    ).then((res) => res.json());
+
+                    setData(updatedData);
+                    setIsModalOpen(false);
+                    setMessage('');
+                    setSelectedImage(null);
+                    setTitle('');
+                    fileInputRef.current.value = '';
                   } catch (error) {
                     console.error('Upload error:', error);
+                  } finally {
+                    setIsUploading(false); // re-enable button
                   }
                 }}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className={`px-4 py-2 text-white rounded ${
+                  isUploading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600'
+                }`}
               >
-                Submit
+                {isUploading ? 'Uploading...' : 'Submit'}
               </button>
             </div>
           </div>
