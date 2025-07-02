@@ -50,7 +50,7 @@ export default function CharmPage() {
         let userUploaded = false;
         let guestUploadCount = 0;
 
-        json.forEach((item: any) => {
+        json.forEach((item: CharmImage) => {
           if (isLoggedIn && item.user?.email) {
             userUploaded = true;
           } else if (!isLoggedIn && item.guestId) {
