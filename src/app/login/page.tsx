@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,12 +29,15 @@ export default function LoginPage() {
 
       const data = await res.json();
       localStorage.setItem('accessToken', data.accessToken); // adjust key if needed
-      router.push('/profile'); // or redirect to home
+      const redirectTo = searchParams.get('redirect') || '/profile';
+      router.push(redirectTo);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     }
   }
+
+  const redirect = searchParams.get('redirect');
 
   return (
     <div className="p-6 max-w-md mx-auto">
@@ -59,9 +64,12 @@ export default function LoginPage() {
       </form>
       <p className="text-center text-sm mt-4">
         Don&apos;t have an account?{' '}
-        <a href="/register" className="text-blue-600 hover:underline">
+        <Link
+          href={`/register${redirect ? `?redirect=${redirect}` : ''}`}
+          className="text-blue-600 hover:underline"
+        >
           Register here
-        </a>
+        </Link>
       </p>
     </div>
   );

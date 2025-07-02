@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 type CharmImage = {
   id: number;
@@ -49,9 +50,11 @@ export default function CharmPage() {
         const guestId = localStorage.getItem('guestId') ?? '';
         let userUploaded = false;
         let guestUploadCount = 0;
+        const payload = token ? JSON.parse(atob(token.split('.')[1])) : null;
+        const loggedInEmail = payload?.sub;
 
         json.forEach((item: CharmImage) => {
-          if (isLoggedIn && item.user?.email) {
+          if (isLoggedIn && item.user?.email === loggedInEmail) {
             userUploaded = true;
           } else if (!isLoggedIn && item.guestId) {
             if (item.guestId === guestId) {
@@ -86,64 +89,72 @@ export default function CharmPage() {
     <main className="relative">
       {data?.[0]?.charm?.name ? (
         <>
-          <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 pt-4 pb-2">
-            <h1 className="text-xl font-semibold">{data[0].charm.name}</h1>
-          </div>
-          <div className="space-y-6 pb-20">
-            {[...data].reverse().map((item) => (
-              <div key={item.id} className="mb-6 px-4">
-                <div className="p-4 bg-white rounded shadow-md">
-                  <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
-                  <p className="text-sm text-gray-700 mt-2">{item.message}</p>
-                  {item.user?.name && (
-                    <p className="text-sm text-gray-600 mt-1 italic">– {item.user.name}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
-            {showTooltip && (
-              <div className="mt-2 px-3 py-1 text-sm bg-black text-white rounded text-center max-w-xs">
-                {(() => {
-                  const token = localStorage.getItem('accessToken');
-                  const isLoggedIn = !!token;
-                  let guestId = localStorage.getItem('guestId');
-                  if (!guestId) {
-                    guestId = '';
-                  }
-                  const userUploaded = data?.some(item => isLoggedIn && item.user?.email);
-                  const guestUploads = data?.filter(item => item.guestId).length ?? 0;
-                  const guestAlreadyUploaded = data?.some(item => item.guestId === guestId);
 
-                  if (!isLoggedIn && guestId && guestAlreadyUploaded) {
-                    return 'You’ve already contributed to this charm!';
-                  } else if (!isLoggedIn && guestUploads >= 5) {
-                    return 'This charm already has 5 guest uploads. Please sign in to contribute!';
-                  } else if (isLoggedIn && userUploaded) {
-                    return 'You’ve already contributed to this charm!';
-                  } else {
-                    return 'You’re not allowed to upload to this charm.';
-                  }
-                })()}
-              </div>
-            )}
-            <button
-              onClick={() => {
-                if (hasUploaded) {
-                  setShowTooltip(true);
-                  setTimeout(() => setShowTooltip(false), 3000);
-                } else {
-                  fileInputRef.current?.click();
-                }
-              }}
-              className={`px-6 py-3 text-white rounded-full shadow-lg ${
-                hasUploaded ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'
-              }`}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{opacity:1}}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.3 }}
             >
-              Upload
-            </button>
-          </div>
+                <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 pt-4 pb-2">
+                    <h1 className="text-xl font-semibold">{data[0].charm.name}</h1>
+                </div>
+                <div className="space-y-6 pb-20">
+                    {[...data].reverse().map((item) => (
+                    <div key={item.id} className="mb-6 px-4">
+                        <div className="p-4 bg-white rounded shadow-md">
+                        <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
+                        <p className="text-sm text-gray-700 mt-2">{item.message}</p>
+                        {item.user?.name && (
+                            <p className="text-sm text-gray-600 mt-1 italic">– {item.user.name}</p>
+                        )}
+                        </div>
+                    </div>
+                    ))}
+                </div>
+                <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                    {showTooltip && (
+                    <div className="mt-2 px-3 py-1 text-sm bg-black text-white rounded text-center max-w-xs">
+                        {(() => {
+                        const token = localStorage.getItem('accessToken');
+                        const isLoggedIn = !!token;
+                        let guestId = localStorage.getItem('guestId');
+                        if (!guestId) {
+                            guestId = '';
+                        }
+                        const userUploaded = data?.some(item => isLoggedIn && item.user?.email);
+                        const guestUploads = data?.filter(item => item.guestId).length ?? 0;
+                        const guestAlreadyUploaded = data?.some(item => item.guestId === guestId);
+
+                        if (!isLoggedIn && guestId && guestAlreadyUploaded) {
+                            return 'You’ve already contributed to this charm!';
+                        } else if (!isLoggedIn && guestUploads >= 5) {
+                            return 'This charm already has 5 guest uploads. Please sign in to contribute!';
+                        } else if (isLoggedIn && userUploaded) {
+                            return 'You’ve already contributed to this charm!';
+                        } else {
+                            return 'You’re not allowed to upload to this charm.';
+                        }
+                        })()}
+                    </div>
+                    )}
+                    <button
+                    onClick={() => {
+                        if (hasUploaded) {
+                        setShowTooltip(true);
+                        setTimeout(() => setShowTooltip(false), 3000);
+                        } else {
+                        fileInputRef.current?.click();
+                        }
+                    }}
+                    className={`px-6 py-3 text-white rounded-full shadow-lg ${
+                        hasUploaded ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'
+                    }`}
+                    >
+                    Upload
+                    </button>
+                </div>
+          </motion.div>
         </>
       ) : (
         <div className="p-6 text-center space-y-6 pb-20">

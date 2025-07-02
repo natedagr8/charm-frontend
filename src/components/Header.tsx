@@ -29,7 +29,13 @@ export default function Header() {
       </div>
 
       {/* Profile Icon */}
-      <button onClick={() => router.push(isLoggedIn ? '/profile' : '/login')} aria-label="Profile">
+      <button
+        onClick={() => {
+          const currentPath = window.location.pathname;
+          router.push(isLoggedIn ? '/profile' : `/login?redirect=${currentPath}`);
+        }}
+        aria-label="Profile"
+      >
         <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2"
              viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round"

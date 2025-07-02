@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +28,8 @@ export default function RegisterPage() {
 
       const data = await res.json();
       localStorage.setItem('accessToken', data.accessToken);
-      router.push('/profile');
+      const redirectTo = searchParams.get('redirect') || '/profile';
+      router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     }
