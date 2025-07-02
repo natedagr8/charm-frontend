@@ -1,9 +1,16 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    setIsLoggedIn(!!token);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-white shadow-md">
@@ -22,7 +29,7 @@ export default function Header() {
       </div>
 
       {/* Profile Icon */}
-      <button onClick={() => router.push('/profile')} aria-label="Profile">
+      <button onClick={() => router.push(isLoggedIn ? '/profile' : '/login')} aria-label="Profile">
         <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2"
              viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round"

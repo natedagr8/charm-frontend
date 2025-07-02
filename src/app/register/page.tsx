@@ -1,0 +1,68 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Registration failed');
+      }
+
+      const data = await res.json();
+      localStorage.setItem('accessToken', data.accessToken);
+      router.push('/profile');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
+    }
+  }
+
+  return (
+    <div className="p-6 max-w-md mx-auto">
+      <h1 className="text-xl font-bold mb-4">Register</h1>
+      <form onSubmit={handleRegister} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Name"
+          className="w-full p-2 border rounded"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-2 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-2 border rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && <p className="text-red-600">{error}</p>}
+        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
+          Register
+        </button>
+      </form>
+    </div>
+  );
+}

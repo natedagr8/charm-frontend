@@ -13,6 +13,12 @@ type CharmImage = {
     charmId: string;
     name: string;
   };
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  guestId: string | null;
 };
 
 export default function CharmPage() {
@@ -25,6 +31,8 @@ export default function CharmPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasUploaded, setHasUploaded] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -34,6 +42,26 @@ export default function CharmPage() {
         );
         const json = await res.json();
         setData(json);
+
+        // Updated guest/user upload detection logic
+        const token = localStorage.getItem('accessToken');
+        const isLoggedIn = !!token;
+        const guestId = localStorage.getItem('guestId') ?? '';
+        let userUploaded = false;
+        let guestUploadCount = 0;
+
+        json.forEach((item: any) => {
+          if (isLoggedIn && item.user?.email) {
+            userUploaded = true;
+          } else if (!isLoggedIn && item.guestId) {
+            if (item.guestId === guestId) {
+              userUploaded = true;
+            }
+            guestUploadCount++;
+          }
+        });
+
+        setHasUploaded(userUploaded || (!isLoggedIn && guestUploadCount >= 5));
       } catch (error) {
         console.error('Failed to fetch charm data:', error);
       } finally {
@@ -67,16 +95,55 @@ export default function CharmPage() {
                 <div className="p-4 bg-white rounded shadow-md">
                   <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
                   <p className="text-sm text-gray-700 mt-2">{item.message}</p>
+                  {item.user?.name && (
+                    <p className="text-sm text-gray-600 mt-1 italic">– {item.user.name}</p>
+                  )}
                 </div>
               </div>
             ))}
           </div>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 text-white bg-blue-600 rounded-full shadow-lg"
-          >
-            Upload
-          </button>
+          <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
+            {showTooltip && (
+              <div className="mt-2 px-3 py-1 text-sm bg-black text-white rounded text-center max-w-xs">
+                {(() => {
+                  const token = localStorage.getItem('accessToken');
+                  const isLoggedIn = !!token;
+                  let guestId = localStorage.getItem('guestId');
+                  if (!guestId) {
+                    guestId = '';
+                  }
+                  const userUploaded = data?.some(item => isLoggedIn && item.user?.email);
+                  const guestUploads = data?.filter(item => item.guestId).length ?? 0;
+                  const guestAlreadyUploaded = data?.some(item => item.guestId === guestId);
+
+                  if (!isLoggedIn && guestId && guestAlreadyUploaded) {
+                    return 'You’ve already contributed to this charm!';
+                  } else if (!isLoggedIn && guestUploads >= 5) {
+                    return 'This charm already has 5 guest uploads. Please sign in to contribute!';
+                  } else if (isLoggedIn && userUploaded) {
+                    return 'You’ve already contributed to this charm!';
+                  } else {
+                    return 'You’re not allowed to upload to this charm.';
+                  }
+                })()}
+              </div>
+            )}
+            <button
+              onClick={() => {
+                if (hasUploaded) {
+                  setShowTooltip(true);
+                  setTimeout(() => setShowTooltip(false), 3000);
+                } else {
+                  fileInputRef.current?.click();
+                }
+              }}
+              className={`px-6 py-3 text-white rounded-full shadow-lg ${
+                hasUploaded ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'
+              }`}
+            >
+              Upload
+            </button>
+          </div>
         </>
       ) : (
         <div className="p-6 text-center space-y-6 pb-20">
@@ -190,13 +257,31 @@ export default function CharmPage() {
                     }
 
                     const formData = new FormData();
+
+                    const token = localStorage.getItem('accessToken');
+                    const isLoggedIn = !!token;
+
+                    if (!isLoggedIn) {
+                      if (!localStorage.getItem('guestId')) {
+                        localStorage.setItem('guestId', (crypto?.randomUUID?.() ?? 'guest-' + Math.random().toString(36).substring(2, 12)));
+                      }
+                      formData.append('guestId', localStorage.getItem('guestId')!);
+                    }
+
                     formData.append('file', fileInputRef.current.files[0]);
                     formData.append('message', message);
 
+
+                    console.log({
+                        guestId: localStorage.getItem('guestId'),
+                        file: fileInputRef.current.files[0],
+                        message,
+                    });
                     const res = await fetch(
                       `${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/images/upload`,
                       {
                         method: 'POST',
+                        headers: isLoggedIn ? { Authorization: `Bearer ${token}` } : undefined,
                         credentials: 'include',
                         body: formData,
                       }
@@ -209,6 +294,7 @@ export default function CharmPage() {
                     ).then((res) => res.json());
 
                     setData(updatedData);
+                    setHasUploaded(true); // Immediately disable the upload button
                     setIsModalOpen(false);
                     setMessage('');
                     setSelectedImage(null);
@@ -216,6 +302,7 @@ export default function CharmPage() {
                     fileInputRef.current.value = '';
                   } catch (error) {
                     console.error('Upload error:', error);
+                    alert(error instanceof Error ? error.message : 'Upload failed. Please try again.');
                   } finally {
                     setIsUploading(false); // re-enable button
                   }
