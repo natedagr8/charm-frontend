@@ -10,10 +10,12 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     try {
+      setIsSubmitting(true);
       const res = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/auth/register`, {
         method: 'POST',
         headers: {
@@ -32,6 +34,7 @@ export default function RegisterPage() {
       router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
+      setIsSubmitting(false);
     }
   }
 
@@ -61,8 +64,12 @@ export default function RegisterPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
         {error && <p className="text-red-600">{error}</p>}
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
-          Register
+        <button
+          type="submit"
+          className={`w-full py-2 rounded text-white ${isSubmitting ? 'bg-blue-300' : 'bg-blue-600'}`}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Registering...' : 'Register'}
         </button>
       </form>
     </div>
