@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function RegisterPage() {
+function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [name, setName] = useState('');
@@ -73,5 +73,13 @@ export default function RegisterPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function RegisterPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterPage />
+    </Suspense>
   );
 }
