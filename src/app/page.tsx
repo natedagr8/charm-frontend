@@ -4,9 +4,22 @@ import  SplitText  from "@/components/SplitText";
 import StarBorder from "@/components/StarBorder";
 import CountUp from "@/components/CountUp";
 import { motion } from 'framer-motion';
+import { useEffect, useState } from "react";
 
 
 export default function Home() {
+  const [tradeCount, setTradeCount] = useState(0);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/stats/trade-count`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setTradeCount(data || 0);
+      })
+      .catch(() => setTradeCount(0));
+  }, []);
+
   return (
     <motion.div
                 initial={{ opacity: 0 }}
@@ -56,7 +69,7 @@ export default function Home() {
           </p>
           <CountUp
             from={0}
-            to={12}
+            to={tradeCount}
             separator=","
             direction="up"
             duration={1}
