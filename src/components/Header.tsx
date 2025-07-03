@@ -25,7 +25,7 @@ export default function Header() {
 
       {/* Logo */}
       <div onClick={() => router.push('/')} className="text-lg font-bold cursor-pointer">
-        CharmTracker
+        Scandi!
       </div>
 
       {/* Profile Icon */}

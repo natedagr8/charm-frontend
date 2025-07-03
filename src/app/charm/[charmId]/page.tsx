@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import ShinyText from '@/components/ShinyText';
 
 type CharmImage = {
   id: number;
@@ -96,13 +97,13 @@ export default function CharmPage() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.3 }}
             >
-                <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 pt-4 pb-2">
+                <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 pt-4 pb-2 mb-6">
                     <h1 className="text-xl font-semibold">{data[0].charm.name}</h1>
                 </div>
                 <div className="space-y-6 pb-20">
                     {[...data].reverse().map((item) => (
                     <div key={item.id} className="mb-6 px-4">
-                        <div className="p-4 bg-white rounded shadow-md">
+                        <div className="p-4 bg-white rounded shadow-md max-w-xs mx-auto">
                         <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
                         <p className="text-sm text-gray-700 mt-2">{item.message}</p>
                         {item.user?.name && (
@@ -151,7 +152,7 @@ export default function CharmPage() {
                         hasUploaded ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'
                     }`}
                     >
-                    Upload
+                    <ShinyText text="Upload"  disabled={hasUploaded} speed={3}/>
                     </button>
                 </div>
           </motion.div>
