@@ -90,7 +90,6 @@ export default function CharmPage() {
     <main className="relative">
       {data?.[0]?.charm?.name ? (
         <>
-
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{opacity:1}}
@@ -104,7 +103,14 @@ export default function CharmPage() {
                     {[...data].reverse().map((item) => (
                     <div key={item.id} className="mb-6 px-4">
                         <div className="p-4 bg-white rounded shadow-md max-w-xs mx-auto">
-                        <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
+                        <motion.div
+                            initial={{ opacity: -2}}
+                            animate={{opacity:1}}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 4 }}
+                        >
+                            <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
+                        </motion.div>
                         <p className="text-sm text-gray-700 mt-2">{item.message}</p>
                         {item.user?.name && (
                             <p className="text-sm text-gray-600 mt-1 italic">– {item.user.name}</p>
@@ -155,7 +161,7 @@ export default function CharmPage() {
                     <ShinyText text="Upload"  disabled={hasUploaded} speed={3}/>
                     </button>
                 </div>
-          </motion.div>
+            </motion.div>
         </>
       ) : (
         <div className="p-6 text-center space-y-6 pb-20">
