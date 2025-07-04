@@ -43,7 +43,7 @@ export default function RootLayout({
             />
           </div>
           <Header />
-          <main id="page-wrap">
+          <main id="page-wrap" className="pt-13">
             {children}
           </main>
         </div>

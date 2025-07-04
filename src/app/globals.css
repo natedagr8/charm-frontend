@@ -5,6 +5,14 @@
   --foreground: #171717;
 }
 
+header {
+  overscroll-behavior: none;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+}
+
 @keyframes star-movement-bottom {
   0% {
     transform: translate(0%, 0%);
