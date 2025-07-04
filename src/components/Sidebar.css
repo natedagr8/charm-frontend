@@ -1,10 +1,16 @@
 /* Position and sizing of burger button */
 .bm-burger-button {
-  position: fixed;
+  position: absolute;
   width: 20px;
   height: 20px;
   left: 16px;
   top: 16px;
+  z-index: 1000;
+}
+
+/* Wrapper to position burger button relative to header */
+.burger-wrapper {
+  position: relative;
   z-index: 1000;
 }
 
