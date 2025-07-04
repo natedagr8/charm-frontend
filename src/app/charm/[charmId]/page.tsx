@@ -21,6 +21,7 @@ type CharmImage = {
     email: string;
   } | null;
   guestId: string | null;
+  uploadedAt: string;
 };
 
 export default function CharmPage() {
@@ -102,7 +103,7 @@ export default function CharmPage() {
                 <div className="space-y-6 pb-20">
                     {[...data].reverse().map((item) => (
                     <div key={item.id} className="mb-6 px-4">
-                        <div className="p-4 bg-white rounded shadow-md max-w-xs mx-auto">
+                        <div className="p-4 bg-white rounded shadow-md max-w-xs mx-auto relative">
                         <motion.div
                             initial={{ opacity: -2}}
                             animate={{opacity:1}}
@@ -112,9 +113,19 @@ export default function CharmPage() {
                             <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
                         </motion.div>
                         <p className="text-sm text-gray-700 mt-2">{item.message}</p>
-                        {item.user?.name && (
-                            <p className="text-sm text-gray-600 mt-1 italic">– {item.user.name}</p>
-                        )}
+                        <p className="text-sm text-gray-600 mt-1 italic flex justify-between">
+                          <span>{item.user?.name ? `– ${item.user.name}` : ''}</span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            {new Date(item.uploadedAt).toLocaleString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true
+                            })}
+                          </span>
+                        </p>
                         </div>
                     </div>
                     ))}
@@ -164,14 +175,18 @@ export default function CharmPage() {
             </motion.div>
         </>
       ) : (
-        <div className="p-6 text-center space-y-6 pb-20">
-          <p className="text-lg font-medium">This charm hasn&rsquo;t been registered yet! Upload a picture of it and give it a name!</p>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-3 text-white bg-green-600 rounded-full shadow-lg"
-          >
-            Register Now
-          </button>
+        <div className="flex flex-col items-center pt-12 min-h-screen px-4 text-center gap-6">
+          <div className="bubble bubble-fade-edges max-w-md">
+            <p className="text-lg sm:text-xl font-medium text-black">
+              This charm hasn&rsquo;t been registered yet! Upload a picture of it and give it a name!
+            </p>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-6 py-3 mt-4 text-white bg-green-600 rounded-full shadow-lg"
+            >
+              Register Now
+            </button>
+          </div>
         </div>
       )}
 
