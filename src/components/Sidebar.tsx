@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { elastic as Menu } from 'react-burger-menu';
+import { bubble as Menu } from 'react-burger-menu';
 import Link from 'next/link';
 import './Sidebar.css';
 
@@ -18,7 +18,7 @@ const Sidebar = () => {
     <Menu
       pageWrapId="page-wrap"
       outerContainerId="outer-container"
-      width={420}
+      width={300}
       isOpen={isOpen}
       onStateChange={handleStateChange}
     >
