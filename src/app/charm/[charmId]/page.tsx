@@ -36,6 +36,7 @@ export default function CharmPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasUploaded, setHasUploaded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -43,6 +44,13 @@ export default function CharmPage() {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/${charmId}/images`
         );
+
+        if (res.status === 404) {
+          setNotFound(true);
+          setIsLoading(false);
+          return;
+        }
+
         const json = await res.json();
         setData(json);
 
@@ -78,6 +86,14 @@ export default function CharmPage() {
       fetchData();
     }
   }, [charmId]);
+
+  if (notFound) {
+    return (
+      <main className="flex items-center justify-center h-screen">
+        <p className="text-lg font-medium text-red-500">404 – Charm Not Found</p>
+      </main>
+    );
+  }
 
   if (isLoading) {
     return (
