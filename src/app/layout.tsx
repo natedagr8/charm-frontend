@@ -33,16 +33,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="fixed inset-0 -z-10">
-          <Iridescence
-            color={[.7,1,1]}
-            mouseReact={false}
-            amplitude={0.1}
-            speed={.6}
-          />
+        <div id="outer-container">
+          <div className="fixed inset-0 -z-10">
+            <Iridescence
+              color={[.7,1,1]}
+              mouseReact={false}
+              amplitude={0.1}
+              speed={.6}
+            />
+          </div>
+          <Header />
+          <main id="page-wrap">
+            {children}
+          </main>
         </div>
-        <Header />
-        {children}
       </body>
     </html>
   );

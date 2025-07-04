@@ -14,7 +14,6 @@ export default function Home() {
     fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/stats/trade-count`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setTradeCount(data || 0);
       })
       .catch(() => setTradeCount(0));
@@ -43,8 +42,8 @@ export default function Home() {
             textAlign="center"
           />
           <p className="text-base sm:text-lg text-black mt-4">
-            This is an early look at our platform for tracking and sharing the stories behind your kandi trades. 
-            Scan a charm’s QR code to see its journey, and add your own memory to the chain.
+            This is an early look at our platform for sharing the stories behind your kandi trades. 
+            Scan a charm’s QR code to see its journey, and add your own memory to the history.
           </p>
         </div>
         <StarBorder
@@ -81,7 +80,7 @@ export default function Home() {
 
         <div className="bubble bubble-fade-edges mt-8">
           <p className="text-base sm:text-lg text-black mb-4">
-            Help us improve! We’d love to hear what you think about the beta. Please. :)
+            Help us improve! We’d love to hear what you think about the beta. Please :)
           </p>
           <StarBorder
             as="button"
