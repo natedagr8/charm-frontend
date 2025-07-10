@@ -33,7 +33,7 @@ function LoginForm() {
       const data = await res.json();
       localStorage.setItem('accessToken', data.accessToken);
       const redirectTo = searchParams.get('redirect') || '/profile';
-      router.push(redirectTo);
+      window.location.href = redirectTo;
       setIsSubmitting(false);
     } catch (err) {
       setIsSubmitting(false);

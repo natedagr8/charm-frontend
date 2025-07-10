@@ -31,6 +31,7 @@ function RegisterPage() {
       const data = await res.json();
       localStorage.setItem('accessToken', data.accessToken);
       const redirectTo = searchParams.get('redirect') || '/profile';
+      router.refresh();
       router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');

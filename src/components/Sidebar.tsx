@@ -21,6 +21,8 @@ const Sidebar = () => {
       width={300}
       isOpen={isOpen}
       onStateChange={handleStateChange}
+      itemListElement="div"
+      className="no-aria-hidden"
     >
       <Link href="/" className="menu-item" onClick={closeMenu}>
         Home
