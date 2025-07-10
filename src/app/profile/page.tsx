@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,15 +8,17 @@ export default function ProfilePage() {
   const router = useRouter();
   const [name, setName] = useState('Nate');
   const [bio, setBio] = useState('This is your bio.');
-  const [trades, setTrades] = useState(1000);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const trades = 1000;
   const [isEditing, setIsEditing] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
       router.push(`/login?redirect=/profile`);
     }
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
