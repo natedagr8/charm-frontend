@@ -43,7 +43,7 @@ export default function MyCharmsPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center pt-12 min-h-screen px-4 text-center gap-6">
+    <div className="flex flex-col items-center pt-12 min-h-screen px-4 text-center gap-6 pb-12">
       <div className="bubble bubble-fade-edges p-4 w-full max-w-2xl">
       <h1 className="text-2xl font-bold mb-4">My Charms</h1>
       {loading ? (
