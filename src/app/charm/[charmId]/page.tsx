@@ -5,6 +5,9 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import ShinyText from '@/components/ShinyText';
+import { Gloria_Hallelujah } from 'next/font/google';
+
+const gloria = Gloria_Hallelujah({ subsets: ['latin'], weight: '400' });
 
 type CharmImage = {
   id: number;
@@ -128,7 +131,7 @@ export default function CharmPage() {
                         >
                             <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
                         </motion.div>
-                        <p className="text-sm text-gray-700 mt-2">{item.message}</p>
+                        <p className={`text-sm text-gray-700 mt-2 ${gloria.className}`}>{item.message}</p>
                         <p className="text-sm text-gray-600 mt-1 italic flex justify-between">
                           <span>{item.user?.name ? `– ${item.user.name}` : ''}</span>
                           <span className="text-xs text-gray-500 ml-2">
