@@ -1,15 +1,37 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [name, setName] = useState('Nate');
-  const [bio, setBio] = useState('This is your bio.');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const trades = 1000;
+  const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/user`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setName(data.name || '');
+          setBio(data.bio || '');
+        }
+      } catch (err) {
+        console.error('Failed to fetch user info:', err);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+  const [trades, setTrades] = useState<number>(0);
   const [isEditing, setIsEditing] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -20,6 +42,29 @@ export default function ProfilePage() {
     }
   }, [router]);
 
+  useEffect(() => {
+    const fetchCharms = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/charm/my-charms`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setTrades(data.length);
+        }
+      } catch (err) {
+        console.error('Failed to fetch charm count:', err);
+      }
+    };
+
+    fetchCharms();
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     window.location.href = '/login';
@@ -29,9 +74,39 @@ export default function ProfilePage() {
     router.push('/profile/settings');
   };
 
-  const handleEditToggle = () => {
+  const handleEditToggle = useCallback(async () => {
+    if (isEditing) {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const nameRes = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/user/name`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ value: name }),
+        });
+
+        const bioRes = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/user/bio`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ value: bio }),
+        });
+
+        if (!nameRes.ok || !bioRes.ok) {
+          console.error('Failed to update user info');
+        }
+      } catch (err) {
+        console.error('Error updating user info:', err);
+      }
+    }
     setIsEditing(!isEditing);
-  };
+  }, [isEditing, name, bio]);
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
