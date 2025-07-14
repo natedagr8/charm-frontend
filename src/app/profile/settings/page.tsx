@@ -97,8 +97,8 @@ export default function SettingsPage() {
               <h2 className="text-lg font-semibold mb-4">Update Password</h2>
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
                 placeholder="Old Password"
                 className="border p-2 w-full mb-4"
               />
