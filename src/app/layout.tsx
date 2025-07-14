@@ -31,10 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased site-body`}>
         <div id="outer-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <div className="fixed inset-0 -z-10">
             <Iridescence
