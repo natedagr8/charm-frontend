@@ -25,7 +25,8 @@ function RegisterPage() {
       });
 
       if (!res.ok) {
-        throw new Error('Registration failed');
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Registration failed');
       }
 
       const data = await res.json();
