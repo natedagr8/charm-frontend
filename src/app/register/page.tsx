@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 function RegisterPage() {
   const searchParams = useSearchParams();
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,7 +21,7 @@ function RegisterPage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, username, password }),
       });
 
       if (!res.ok) {
@@ -49,6 +50,13 @@ function RegisterPage() {
             className="w-full p-2 border rounded"
             value={name}
             onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Username"
+            className="w-full p-2 border rounded"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <input
             type="email"
