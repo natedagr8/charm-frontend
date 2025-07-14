@@ -30,7 +30,7 @@
   width: 24px;
   position: relative;
   top: 0px;
-  left: 260px;
+  
 }
 
 /* Color/shape of close button cross */
@@ -78,4 +78,13 @@ Note: Beware of modifying this element as it can break the animations - you shou
     height: 100%;
     top:0px;
   background: rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-link .menu-item {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  text-decoration: none;
+  display: block;
+  padding: 10px 0;
 }

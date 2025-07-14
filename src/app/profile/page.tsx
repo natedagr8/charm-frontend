@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -34,7 +33,6 @@ export default function ProfilePage() {
   const [trades, setTrades] = useState<number>(0);
   const [isEditing, setIsEditing] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) {

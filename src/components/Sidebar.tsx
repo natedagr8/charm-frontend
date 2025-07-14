@@ -18,31 +18,19 @@ const Sidebar = () => {
     <Menu
       pageWrapId="page-wrap"
       outerContainerId="outer-container"
-      width={300}
+      width={220}
       isOpen={isOpen}
       onStateChange={handleStateChange}
       itemListElement="div"
       className="no-aria-hidden"
     >
-      <Link href="/" className="menu-item" onClick={closeMenu}>
-        Home
-      </Link>
-      <Link href="/scan" className="menu-item" onClick={closeMenu}>
-        Scan Charm
-      </Link>
-      <Link href="/my-charms" className="menu-item" onClick={closeMenu}>
-        My Charms
-      </Link>
-      {/* TODO */}
-      {/* <Link href="/friends" className="menu-item" onClick={closeMenu}>
-        Friends
-      </Link> */}
-      <Link href="/store" className="menu-item" onClick={closeMenu}>
-        Store
-      </Link>
-      <Link href="/about" className="menu-item" onClick={closeMenu}>
-        About
-      </Link>
+      <div className="sidebar-link"><Link href="/" className="menu-item" onClick={closeMenu}>Home</Link></div>
+      <hr />
+      <div className="sidebar-link"><Link href="/my-charms" className="menu-item" onClick={closeMenu}>My Charms</Link></div>
+      <hr />
+      <div className="sidebar-link"><Link href="/store" className="menu-item" onClick={closeMenu}>Store</Link></div>
+      <hr />
+      <div className="sidebar-link"><Link href="/about" className="menu-item" onClick={closeMenu}>About</Link></div>
     </Menu>
   );
 };
