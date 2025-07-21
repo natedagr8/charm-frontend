@@ -57,7 +57,7 @@ export default function Home() {
             href="https://kickstarter.com" // TODO: Update to actual Kickstarter campaign link
             target="_blank"
           >
-            View our Kickstarter!!
+            Visit our Kickstarter!!
           </a>
         </StarBorder>
 

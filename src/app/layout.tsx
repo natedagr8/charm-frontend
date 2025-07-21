@@ -4,6 +4,7 @@ import "./globals.css";
 import Iridescence from '../components/Iridescence';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import TokenCleanup from '../components/TokenCleanup';
 
 
 const geistSans = Geist({
@@ -32,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased site-body`}>
+        <TokenCleanup />
         <div id="outer-container" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <div className="fixed inset-0 -z-10">
             <Iridescence

@@ -20,7 +20,7 @@ export default function AboutPage() {
       </div>
 
       <p className="mb-6 text-lg">
-        This project was created with community, creativity, and memory-sharing in mind. Stay tuned for future updates that will introduce more interactive features, customization options, and ways to connect with fellow charmers! This current version was slapped together relatively quickly with Elements being the deadline in mind. Please share any feedback with our support email!
+        This project was created with community, creativity, and memory-sharing in mind. Stay tuned for future updates that will introduce more interactive features, customization options, and ways to connect with fellow charmers! This current version was slapped together relatively quickly with Elements being the deadline in mind. Please share any feedback by participating in this survey or shooting us a message on Instagram!
       </p>
 
       <div className="mb-12 bg-gray-800 h-64 rounded-lg flex items-center justify-center text-gray-400">
