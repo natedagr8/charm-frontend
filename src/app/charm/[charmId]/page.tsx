@@ -197,7 +197,7 @@ export default function CharmPage() {
         <div className="flex flex-col items-center pt-12 min-h-screen px-4 text-center gap-6">
           <div className="bubble bubble-fade-edges max-w-md">
             <p className="text-lg sm:text-xl font-medium text-black">
-              This charm hasn&rsquo;t been registered yet! Upload a picture of it and give it a name!
+              This charm hasn&rsquo;t been registered yet! Upload a picture of your kandi and give it a name!
             </p>
             <button
               onClick={() => fileInputRef.current?.click()}

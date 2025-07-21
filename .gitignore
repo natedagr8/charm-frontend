@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# qr code output
+/tools/qr-generator/output
+
 # next.js
 /.next/
 /out/
