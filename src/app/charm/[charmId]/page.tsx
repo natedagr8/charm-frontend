@@ -41,6 +41,13 @@ export default function CharmPage() {
   const [showTooltip, setShowTooltip] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
+  const [isGuestUser, setIsGuestUser] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    setIsGuestUser(!token);
+  }, []);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -108,6 +115,29 @@ export default function CharmPage() {
 
   return (
     <main className="relative">
+      {isGuestUser && (
+        <section className="bg-[#affafb] text-center py-4 px-2 shadow-inner text-sm">
+          <h2 className="text-lg font-bold mb-1">Welcome to Charmski!</h2>
+          <p className="text-gray-800 max-w-md mx-auto mb-3">
+            This is a space to celebrate and share the journey of the charm you just scanned! Upload a picture and a message to mark your moment!
+          </p>
+          <p className="text-gray-800 max-w-md text-left mx-auto mb-1 font-medium">
+            Not sure what to upload? Try:
+          </p>
+          <ul className="list-disc list-inside text-left text-gray-800 max-w-md mx-auto mb-4 space-y-1">
+            <li>A picture with the person you got it from</li>
+            <li>A pic of the stage</li>
+            <li>A selfie</li>
+            <li>Anything else that captures your charm&apos;s story</li>
+          </ul>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="px-4 py-2 text-white bg-[#af90ec] rounded-full shadow"
+          >
+            Upload to Begin
+          </button>
+        </section>
+      )}
       {data?.[0]?.charm?.name ? (
         <>
             <motion.div
@@ -149,6 +179,7 @@ export default function CharmPage() {
                     </div>
                     ))}
                 </div>
+                {!isGuestUser && (
                 <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
                     {showTooltip && (
                     <div className="mt-2 px-3 py-1 text-sm bg-black text-white rounded text-center max-w-xs">
@@ -185,19 +216,20 @@ export default function CharmPage() {
                         }
                     }}
                     className={`px-6 py-3 text-white rounded-full shadow-lg ${
-                        hasUploaded ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'
+                        hasUploaded ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#af90ec]'
                     }`}
                     >
                     <ShinyText text="Upload"  disabled={hasUploaded} speed={3}/>
                     </button>
                 </div>
+                )}
             </motion.div>
         </>
       ) : (
         <div className="flex flex-col items-center pt-12 min-h-screen px-4 text-center gap-6">
           <div className="bubble bubble-fade-edges max-w-md">
             <p className="text-lg sm:text-xl font-medium text-black">
-              This charm hasn&rsquo;t been registered yet! Upload a picture of your kandi and give it a name!
+              This charm hasn&#39;t been registered yet! Upload a picture of your kandi and give it a name!
             </p>
             <button
               onClick={() => fileInputRef.current?.click()}

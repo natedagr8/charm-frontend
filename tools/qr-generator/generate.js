@@ -10,7 +10,7 @@ const BASE_URL = 'https://scandi-production.up.railway.app';
 const CREATE_CHARM_ENDPOINT = `${BASE_URL}/api/charm`;
 const OUTPUT_DIR = './tools/qr-generator/output';
 const TOKEN = `Bearer ${process.env.NEXT_PRIVATE_ADMIN_TOKEN}`;
-const NUM_CODES = 10; // Adjust number of codes to generate
+const NUM_CODES = 200; // Adjust number of codes to generate
 
 async function createCharm() {
   const res = await fetch(CREATE_CHARM_ENDPOINT, {

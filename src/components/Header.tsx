@@ -14,7 +14,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-white shadow-md">
+    <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-[#affafb] shadow-md">
       <Sidebar />
 
       {/* Logo */}

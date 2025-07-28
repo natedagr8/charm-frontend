@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 function RegisterPage() {
@@ -12,8 +12,38 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Validation constraints
+  const MAX_NAME_LENGTH = 32;
+  const MAX_USERNAME_LENGTH = 32;
+  const MAX_EMAIL_LENGTH = 254;
+  const MAX_PASSWORD_LENGTH = 128;
+  const MIN_NAME_LENGTH = 3;
+  const MIN_USERNAME_LENGTH = 5;
+
+  useEffect(() => {
+    const errors: string[] = [];
+
+    if (name.length > MAX_NAME_LENGTH) errors.push('Name is too long');
+    if (name.length > 0 && name.length < MIN_NAME_LENGTH) errors.push('Name is too short');
+    if (username.length > MAX_USERNAME_LENGTH) errors.push('Username is too long');
+    if (username.length > 0 && username.length < MIN_USERNAME_LENGTH) errors.push('Username is too short');
+    if (email.length > MAX_EMAIL_LENGTH) errors.push('Email is too long');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email.length > 0 && !emailRegex.test(email)) errors.push('Invalid email format');
+    if (password.length > MAX_PASSWORD_LENGTH) errors.push('Password is too long');
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+    if (password.length > 0 && !passwordRegex.test(password)) errors.push('Password must be at least 8 characters long and include at least one letter and one number');
+
+    setError(errors.join(', '));
+  }, [name, username, email, password]);
+
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
+
+    if (error) {
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const res = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/auth/register`, {
@@ -50,28 +80,32 @@ function RegisterPage() {
             placeholder="Name"
             className="w-full p-2 border rounded"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value.slice(0, MAX_NAME_LENGTH))}
+            maxLength={MAX_NAME_LENGTH}
           />
           <input
             type="text"
             placeholder="Username"
             className="w-full p-2 border rounded"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value.slice(0, MAX_USERNAME_LENGTH))}
+            maxLength={MAX_USERNAME_LENGTH}
           />
           <input
             type="email"
             placeholder="Email"
             className="w-full p-2 border rounded"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.slice(0, MAX_EMAIL_LENGTH))}
+            maxLength={MAX_EMAIL_LENGTH}
           />
           <input
             type="password"
             placeholder="Password"
             className="w-full p-2 border rounded"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value.slice(0, MAX_PASSWORD_LENGTH))}
+            maxLength={MAX_PASSWORD_LENGTH}
           />
           {error && <p className="text-red-600">{error}</p>}
           <button
