@@ -161,7 +161,7 @@ export default function CharmPage() {
                         >
                             <Image src={item.imageUrl} alt={`Charm ${charmId}`} width={800} height={600} className="w-full h-auto object-contain rounded" />
                         </motion.div>
-                        <p className={`text-sm text-gray-700 mt-2 ${gloria.className}`}>{item.message}</p>
+                        <p className={`text-sm text-gray-700 mt-2 break-words whitespace-pre-wrap ${gloria.className}`}>{item.message}</p>
                         <p className="text-sm text-gray-600 mt-1 italic flex justify-between">
                           <span>{item.user?.name ? `– ${item.user.name}` : ''}</span>
                           <span className="text-xs text-gray-500 ml-2">
@@ -305,6 +305,7 @@ export default function CharmPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter a name for this charm"
+                maxLength={32}
                 className="w-full p-2 border rounded mb-4"
                 required
               />
@@ -313,6 +314,7 @@ export default function CharmPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Add a message..."
+              maxLength={255}
               className="w-full p-2 border rounded mb-4"
             />
             <div className="flex justify-end gap-2">
@@ -326,6 +328,17 @@ export default function CharmPage() {
                 disabled={isUploading}
                 onClick={async () => {
                   if (!selectedImage || !fileInputRef.current?.files?.[0] || (!data?.[0]?.charm?.name && !title.trim())) return;
+
+                  // Validation: message and title length
+                  if (message.length > 255) {
+                    alert("Message must be 255 characters or fewer.");
+                    return;
+                  }
+
+                  if (title.length > 32) {
+                    alert("Title must be 32 characters or fewer.");
+                    return;
+                  }
 
                   setIsUploading(true); // disable button
 
