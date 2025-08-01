@@ -1,8 +1,6 @@
-
-
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
   const [usernameModal, setUsernameModal] = useState(false);
@@ -14,20 +12,140 @@ export default function SettingsPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [oldPassword, setOldPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleUsernameChange = () => {
-    // Call API to update username
-    setUsernameModal(false);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('accessToken');
+      setToken(storedToken);
+    }
+  }, []);
+
+  const handleUsernameChange = async () => {
+    if (!username) {
+      alert('Please enter a new username.');
+      return;
+    }
+    if (username.length < 5 || username.length > 32) {
+      alert('Username must be between 5 and 32 characters.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/user/username`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ value: username }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.message || 'Username update failed.');
+        return;
+      }
+
+      alert('Username updated successfully!');
+      localStorage.removeItem('accessToken');
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Error updating username:', error);
+      alert('Something went wrong. Please try again.');
+    }
   };
 
-  const handleEmailChange = () => {
-    // Call API to update email
-    setEmailModal(false);
+  const handleEmailChange = async () => {
+    if (!email) {
+      alert('Please enter a new email.');
+      return;
+    }
+    if (email.length > 254) {
+      alert('Email is too long.');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('Invalid email format.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/user/email`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ value: email }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.message || 'Email update failed.');
+        return;
+      }
+
+      alert('Email updated successfully!');
+      localStorage.removeItem('accessToken');
+      window.location.href = '/login';
+      setEmailModal(false);
+      setEmail('');
+    } catch (error) {
+      console.error('Error updating email:', error);
+      alert('Something went wrong. Please try again.');
+    }
   };
 
-  const handlePasswordChange = () => {
-    // Call API to update password
-    setPasswordModal(false);
+  const handlePasswordChange = async () => {
+    if (!oldPassword || !password) {
+      alert('Please fill out both old and new password fields.');
+      return;
+    }
+    
+    if (password.length > 128) {
+      alert('Password is too long.');
+      return;
+    }
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      alert('Password must be at least 8 characters long and include at least one letter and one number.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SCANDI_BACKEND_URL}api/auth/password`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: oldPassword,
+          newPassword: password,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.message || 'Password update failed.');
+        return;
+      }
+
+      alert('Password updated successfully!');
+      localStorage.removeItem('accessToken');
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Error updating password:', error);
+      alert('Something went wrong. Please try again.');
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -111,8 +229,8 @@ export default function SettingsPage() {
               />
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm New Password"
                 className="border p-2 w-full mb-4"
               />
