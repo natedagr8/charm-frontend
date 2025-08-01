@@ -11,6 +11,7 @@ function RegisterPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [promotionalOptIn, setPromotionalOptIn] = useState(true);
 
   // Validation constraints
   const MAX_NAME_LENGTH = 32;
@@ -51,7 +52,7 @@ function RegisterPage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, email, username, password }),
+        body: JSON.stringify({ name, email, username, password, promotionalEmailOptIn: promotionalOptIn }),
       });
 
       if (!res.ok) {
@@ -108,6 +109,14 @@ function RegisterPage() {
             maxLength={MAX_PASSWORD_LENGTH}
           />
           {error && <p className="text-red-600">{error}</p>}
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={promotionalOptIn}
+              onChange={(e) => setPromotionalOptIn(e.target.checked)}
+            />
+            <span className="text-sm">I want to receive promotional emails</span>
+          </label>
           <button
             type="submit"
             className={`w-full py-2 rounded text-white ${isSubmitting ? 'bg-blue-300' : 'bg-blue-600'}`}
