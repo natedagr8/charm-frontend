@@ -54,14 +54,13 @@ export default function Home() {
           speed="5s"
         >
           <a
-            href="https://kickstarter.com" // TODO: Update to actual Kickstarter campaign link
+            href="https://www.kickstarter.com/projects/charmski/charmski"
             target="_blank"
           >
             Visit our Kickstarter!!
           </a>
         </StarBorder>
 
-        {/* TODO: Call an endpoint to get the total number of image uploads from the database */}
         <div className="bubble bubble-fade-edges">
           <p className="text-base sm:text-lg text-black mb-2">
             Trades completed and memories shared:
