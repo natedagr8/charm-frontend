@@ -44,6 +44,8 @@ export default function Home() {
           <p className="text-base sm:text-lg text-black mt-4">
             This is an early look at our platform for sharing the stories behind your kandi trades. 
             Scan a charm’s QR code to see its journey, and add your own memory to the history.
+
+            Kickstarter launching August 7th!
           </p>
         </div>
         <StarBorder
