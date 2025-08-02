@@ -150,7 +150,7 @@ export default function CharmPage() {
                     <h1 className="text-xl font-semibold">{data[0].charm.name}</h1>
                 </div>
                 <div className="space-y-6 pb-20">
-                    {[...data].reverse().map((item) => (
+                    {[...data].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()).map((item) => (
                     <div key={item.id} className="mb-6 px-4">
                         <div className="p-4 bg-white rounded shadow-md max-w-xs mx-auto relative">
                         <motion.div
